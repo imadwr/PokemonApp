@@ -3,11 +3,13 @@ package com.example.pokemonapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.pokemonapp.model.Pokemon;
+import com.example.pokemonapp.model.PokemonsListViewModel;
 import com.example.pokemonapp.model.PokemonsResponse;
 import com.example.pokemonapp.service.PokemonServiceAPI;
 
@@ -22,18 +24,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<String> data = new ArrayList<>();
+    List<Pokemon> data = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
 
         ListView listViewPokemons = findViewById(R.id.listviewPokemons);
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
-        listViewPokemons.setAdapter(arrayAdapter);
+        //ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
+        PokemonsListViewModel listViewModel = new PokemonsListViewModel(this, R.layout.pokemons_list_view_layout, data);
+        listViewPokemons.setAdapter(listViewModel);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://pokeapi.co/")
@@ -53,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
                 PokemonsResponse pokemonsResponse = response.body();
                 for(Pokemon pokemon : pokemonsResponse.pokemons){
-                    data.add(pokemon.name);
+                    data.add(pokemon);
                 }
-                arrayAdapter.notifyDataSetChanged();
+                listViewModel.notifyDataSetChanged();
             }
 
             @Override
