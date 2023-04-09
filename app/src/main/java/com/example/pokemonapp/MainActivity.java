@@ -2,9 +2,12 @@ package com.example.pokemonapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -25,6 +28,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     List<Pokemon> data = new ArrayList<>();
+    public static final String POKEMON_NAME_PARAM = "pokemon.name";
+    public static final String POKEMON_ID = "pokemon.id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<PokemonsResponse> call, Throwable t) {
                 Log.e("error", "Error");
+            }
+        });
+
+        listViewPokemons.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String pokemonName = data.get(i).name;
+                Log.i("info", pokemonName);
+                Intent intent = new Intent(getApplicationContext(), PokemonDetailsActivity.class);
+                intent.putExtra(POKEMON_NAME_PARAM, pokemonName);
+                intent.putExtra(POKEMON_ID, i+1);
+                startActivity(intent);
             }
         });
     }
